@@ -11,19 +11,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, home-manager }: 
-    flake-utils.lib.eachDefaultSystem (system:
-    let
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-    in {
-      nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          ./hosts/default/configuration.nix
-        ];
-      };
-    });
+  outputs = { self, nixpkgs, flake-utils, home-manager }: {
+    nixosConfigurations.default = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./hosts/default/configuration.nix
+      ];
+    };
+  };
 }
