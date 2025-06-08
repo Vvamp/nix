@@ -8,8 +8,8 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  ../../hardware/hardware-configuration.nix
+      ];
 
   # NixOS Settings
   nixpkgs.config.allowUnfree = true;
