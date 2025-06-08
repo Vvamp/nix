@@ -1,3 +1,6 @@
+# ╔══════════════════════════════════════════╗
+# ║      Vvamp’s NixOS Configuration         ║
+# ╚══════════════════════════════════════════╝
 { config, pkgs, lib, ... }:
 
 {
@@ -26,7 +29,6 @@
     mangohud
     libnotify
     pciutils
-    speedtest-cli
     python3
     python3Packages.pynvim
     lua
@@ -37,9 +39,7 @@
     tealdeer
     mesa-demos
     ffmpeg-full
-    mpv
     ghidra
-    arduino-ide
     jdk21
     ltrace
     libgcc
@@ -89,10 +89,10 @@
   # X11 / Wayland & Desktop
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "vvamp";
-  };
+  # services.displayManager.autoLogin = {
+  #   enable = true;
+  #   user = "vvamp";
+  # };
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
   environment.plasma6.excludePackages = with pkgs.kdePackages; [

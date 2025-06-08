@@ -1,3 +1,7 @@
+# ╔══════════════════════════════════════════╗
+# ║      Vvamp’s NixOS Configuration         ║
+# ╚══════════════════════════════════════════╝
+
 { config, pkgs, ... }:
 
 {
@@ -20,12 +24,17 @@
     jetbrains.idea-ultimate
     qpwgraph
     hyperfine
+    speedtest-cli
+    mpv
+    vscode
+    arduino-ide
+    firefox
   ];
 
   programs.git = {
     enable = true;
     userName = "Vvamp";
-    userEmail = "your@email.com";
+    userEmail = "vvampus@gmail.com";
   };
 
   programs.fish = {

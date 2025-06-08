@@ -1,5 +1,8 @@
+# ╔══════════════════════════════════════════╗
+# ║      Vvamp’s NixOS Configuration         ║
+# ╚══════════════════════════════════════════╝
 {
-  description = "NixOS configuration";
+  description = "Vvamp's NixOS configuration";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -16,7 +19,6 @@
         nixos = nixpkgs.lib.nixosSystem {
           inherit system;
 
-          # insert this first to allow unfree packages
           modules = [
             ( { lib, ... }: {
                 nixpkgs.config = {
@@ -26,7 +28,6 @@
                 };
             } )
 
-            # then your normal modules
             ./hosts/default/configuration.nix
 
             home-manager.nixosModules.home-manager
