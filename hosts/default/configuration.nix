@@ -25,10 +25,10 @@
     vim
     neovim
     wget
-    jq
+    jq# JSON Parser (used mainly in pipeconfig bash scripts)
     mangohud
-    libnotify
-    pciutils
+    libnotify # notify-send etc
+    pciutils # Lspci etc
     python3
     python3Packages.pynvim
     lua
@@ -37,7 +37,7 @@
     wayland-utils
     wl-clipboard
     tealdeer
-    mesa-demos
+    mesa-demos # GLXGears etc
     ffmpeg-full
     ghidra
     jdk21

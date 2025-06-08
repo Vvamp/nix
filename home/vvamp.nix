@@ -29,6 +29,7 @@
     vscode
     arduino-ide
     firefox
+    flameshot
   ];
 
   programs.git = {
@@ -54,4 +55,9 @@
   };
 
   programs.atuin.enable = true;
+
+  services.flameshot = {
+    enable = true;
+  };
+  
 }

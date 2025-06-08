@@ -37,6 +37,9 @@
               home-manager.backupFileExtension = "backup"; 
               home-manager.users.vvamp       = ./home/vvamp.nix;
             }
+             {
+               environment.systemPackages = with pkgs; [ home-manager ];
+             }
           ];
 
           specialArgs = { inherit home-manager; };
