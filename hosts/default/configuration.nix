@@ -15,9 +15,28 @@
   };
 
   # Bootloader & Kernel
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot = {
+    # Use the GRUB 2 boot loader.
+    loader.grub = {
+      enable = true;
+      efiSupport = true;
+      device = "nodev";
+      darkmatter-theme = {
+        enable = true;
+        style = "nixos";
+        icon = "color";
+        resolution = "1080p";
+      };
+    };
+    loader.efi.canTouchEfiVariables = true;
+    loader.efi.efiSysMountPoint = "/boot"; 
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = ["quiet" "splash" "udev.log_level=3"];
+    # Quiet boot
+    consoleLogLevel = 0;
+    initrd.verbose = false;
+};
+
 
   # System-wide packages
   environment.systemPackages = with pkgs; [

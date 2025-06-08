@@ -8,9 +8,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    darkmatter-grub-theme = {
+      url = gitlab:VandalByte/darkmatter-grub-theme;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, home-manager, darkmatter-grub-theme, ... }:
     let
       system = "x86_64-linux";
       pkgs   = nixpkgs.legacyPackages.${system};
@@ -27,7 +31,7 @@
                     builtins.elem (lib.getName pkg) [ "masterpdfeditor" ];
                 };
             } )
-
+            darkmatter-grub-theme.nixosModule
             ./hosts/default/configuration.nix
 
             home-manager.nixosModules.home-manager

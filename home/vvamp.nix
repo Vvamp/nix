@@ -30,6 +30,10 @@
     arduino-ide
     firefox
     flameshot
+    bat 
+    dust
+    fd 
+    
   ];
 
   programs.git = {
@@ -47,6 +51,9 @@
       du = "dust";
       cat = "bat";
     };
+    interactiveShellInit = ''
+          atuin init fish | source
+      '';
   };
 
   programs.zoxide = {
