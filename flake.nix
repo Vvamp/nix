@@ -11,12 +11,17 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, home-manager }: {
+    outputs = { self, nixpkgs, home-manager, ... }: {
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
+        system = "x86_64-linux";
+        modules = [
         ./hosts/default/configuration.nix
-      ];
+        home-manager.nixosModules.home-manager
+        ];
+        specialArgs = {
+        inherit home-manager;
+        };
     };
-  };
+    };
+
 }
