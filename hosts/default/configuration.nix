@@ -1,7 +1,12 @@
 # ╔══════════════════════════════════════════╗
 # ║      Vvamp’s NixOS Configuration         ║
 # ╚══════════════════════════════════════════╝
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -29,14 +34,17 @@
       };
     };
     loader.efi.canTouchEfiVariables = true;
-    loader.efi.efiSysMountPoint = "/boot"; 
+    loader.efi.efiSysMountPoint = "/boot";
     kernelPackages = pkgs.linuxPackages_latest;
-    kernelParams = ["quiet" "splash" "udev.log_level=3"];
+    kernelParams = [
+      "quiet"
+      "splash"
+      "udev.log_level=3"
+    ];
     # Quiet boot
     consoleLogLevel = 0;
     initrd.verbose = false;
-};
-
+  };
 
   # System-wide packages
   environment.systemPackages = with pkgs; [
@@ -44,7 +52,7 @@
     vim
     neovim
     wget
-    jq# JSON Parser (used mainly in pipeconfig bash scripts)
+    jq # JSON Parser (used mainly in pipeconfig bash scripts)
     mangohud
     libnotify # notify-send etc
     pciutils # Lspci etc
@@ -71,6 +79,7 @@
     p7zip
     unrar
     ripgrep
+    nixfmt-rfc-style # Nix format
   ];
 
   # User setup
@@ -78,7 +87,11 @@
     isNormalUser = true;
     description = "Vvamp";
     shell = pkgs.fish;
-    extraGroups = [ "networkmanager" "wheel" "dialout" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "dialout"
+    ];
   };
   programs.fish.enable = true;
 
@@ -149,18 +162,19 @@
     localNetworkGameTransfers.openFirewall = true;
     gamescopeSession.enable = false;
     package = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
-        libpng
-        libpulseaudio
-        libvorbis
-        stdenv.cc.cc.lib
-        libkrb5
-        keyutils
-      ];
+      extraPkgs =
+        pkgs: with pkgs; [
+          xorg.libXcursor
+          xorg.libXi
+          xorg.libXinerama
+          xorg.libXScrnSaver
+          libpng
+          libpulseaudio
+          libvorbis
+          stdenv.cc.cc.lib
+          libkrb5
+          keyutils
+        ];
     };
   };
   programs.gamemode.enable = true;
@@ -176,7 +190,6 @@
       PasswordAuthentication = false;
     };
   };
-
 
   # Environment variables
   environment.sessionVariables = {
@@ -204,9 +217,21 @@
   # Nix-ld support
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
-    cups freetype sane-backends pkcs11helper qt5.qtsvg qt5.qtbase
-    qt5.qtdeclarative qt5.qtquickcontrols qt5.qttools
-    mesa libglvnd xorg.libxcb xorg.libX11 libxkbcommon qt5.qtbase.dev
+    cups
+    freetype
+    sane-backends
+    pkcs11helper
+    qt5.qtsvg
+    qt5.qtbase
+    qt5.qtdeclarative
+    qt5.qtquickcontrols
+    qt5.qttools
+    mesa
+    libglvnd
+    xorg.libxcb
+    xorg.libX11
+    libxkbcommon
+    qt5.qtbase.dev
   ];
 
   # GPU

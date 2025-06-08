@@ -10,6 +10,8 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
+    firefox
+
     atuin
     eza
     procs
@@ -28,12 +30,11 @@
     mpv
     vscode
     arduino-ide
-    firefox
     flameshot
-    bat 
+    bat
     dust
-    fd 
-    
+    fd
+
   ];
 
   programs.git = {
@@ -52,8 +53,8 @@
       cat = "bat";
     };
     interactiveShellInit = ''
-          atuin init fish | source
-      '';
+      atuin init fish | source
+    '';
   };
 
   programs.zoxide = {
@@ -66,5 +67,5 @@
   services.flameshot = {
     enable = true;
   };
-  
+
 }
