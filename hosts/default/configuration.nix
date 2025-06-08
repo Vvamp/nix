@@ -6,7 +6,6 @@
   ];
 
   # Nix settings
-  nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # Bootloader
@@ -60,6 +59,7 @@
     shell = pkgs.fish;
     extraGroups = [ "networkmanager" "wheel" "dialout" ];
   };
+programs.fish.enable = true;
 
   home-manager.users.vvamp = import ../../home/vvamp.nix;
 

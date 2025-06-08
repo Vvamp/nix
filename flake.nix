@@ -11,17 +11,28 @@
     };
   };
 
-    outputs = { self, nixpkgs, home-manager, ... }: {
-    nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+  outputs = { self, nixpkgs, home-manager, flake-utils, ... }: 
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        config = {
+          allowUnfree = true;
+          allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+            "masterpdfeditor"
+          ];
+        };
+      };
+    in {
+      nixosConfigurations.default = nixpkgs.lib.nixosSystem {
+        inherit system;
         modules = [
-        ./hosts/default/configuration.nix
-        home-manager.nixosModules.home-manager
+          ./hosts/default/configuration.nix
+          home-manager.nixosModules.home-manager
         ];
         specialArgs = {
-        inherit home-manager;
+          inherit pkgs home-manager;
         };
+      };
     };
-    };
-
 }
