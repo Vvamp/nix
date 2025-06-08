@@ -1,37 +1,44 @@
 {
-  description = "Vvamp's NixOS Config";
+  description = "NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, ... }: 
+  outputs = { nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        config = {
-          allowUnfree = true;
-          allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-            "masterpdfeditor"
-          ];
-        };
-      };
+      pkgs   = nixpkgs.legacyPackages.${system};
     in {
-      nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          ./hosts/default/configuration.nix
-          home-manager.nixosModules.home-manager
-        ];
-        specialArgs = {
-          inherit pkgs home-manager;
+      nixosConfigurations = {
+        nixos = nixpkgs.lib.nixosSystem {
+          inherit system;
+
+          # insert this first to allow unfree packages
+          modules = [
+            ( { lib, ... }: {
+                nixpkgs.config = {
+                  allowUnfree = true;
+                  allowUnfreePredicate = pkg:
+                    builtins.elem (lib.getName pkg) [ "masterpdfeditor" ];
+                };
+            } )
+
+            # then your normal modules
+            ./hosts/default/configuration.nix
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs     = true;
+              home-manager.useUserPackages   = true;
+              home-manager.backupFileExtension = "backup"; 
+              home-manager.users.vvamp       = ./home/vvamp.nix;
+            }
+          ];
+
+          specialArgs = { inherit home-manager; };
         };
       };
     };

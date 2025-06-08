@@ -5,10 +5,13 @@
     ../../hardware/hardware-configuration.nix
   ];
 
-  # Nix settings
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix = {
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
 
-  # Bootloader
+  # Bootloader & Kernel
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -23,7 +26,6 @@
     mangohud
     libnotify
     pciutils
-    lact
     speedtest-cli
     python3
     python3Packages.pynvim
@@ -59,11 +61,9 @@
     shell = pkgs.fish;
     extraGroups = [ "networkmanager" "wheel" "dialout" ];
   };
-programs.fish.enable = true;
+  programs.fish.enable = true;
 
-  home-manager.users.vvamp = import ../../home/vvamp.nix;
-
-  # Hostname & locale
+  # Hostname, Networking & Locale
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
   time.timeZone = "Europe/Amsterdam";
@@ -80,20 +80,20 @@ programs.fish.enable = true;
     LC_TIME = "nl_NL.UTF-8";
   };
 
-  # Keyboard
+  # Keyboard layout
   services.xserver.xkb = {
     layout = "us";
     options = "eurosign:e,caps:escape";
   };
 
-  # Desktop
+  # X11 / Wayland & Desktop
   services.xserver.enable = true;
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "vvamp";
-  services.displayManager.sddm = {
+  services.displayManager.sddm.enable = true;
+  services.displayManager.autoLogin = {
     enable = true;
-    wayland.enable = true;
+    user = "vvamp";
   };
+  services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     konsole
@@ -101,7 +101,7 @@ programs.fish.enable = true;
     spectacle
   ];
 
-  # Audio
+  # Audio (PipeWire)
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -122,7 +122,7 @@ programs.fish.enable = true;
   # Flatpak
   services.flatpak.enable = true;
 
-  # Steam + Gamescope
+  # Steam & Gamescope
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
@@ -158,11 +158,8 @@ programs.fish.enable = true;
     };
   };
 
-  # Systemd tweaks
-  systemd.packages = with pkgs; [ lact ];
-  systemd.services.lactd.wantedBy = [ "multi-user.target" ];
 
-  # Environment
+  # Environment variables
   environment.sessionVariables = {
     GDK_BACKEND = "wayland,x11";
     QT_QPA_PLATFORM = "wayland;xcb";
@@ -199,5 +196,6 @@ programs.fish.enable = true;
     enable32Bit = true;
   };
 
+  # System state version
   system.stateVersion = "25.05";
 }
