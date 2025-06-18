@@ -2,7 +2,12 @@
 # ║      Vvamp’s NixOS Configuration         ║
 # ╚══════════════════════════════════════════╝
 
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   home.username = "vvamp";
@@ -10,16 +15,16 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    firefox
-
+    inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
+    chromium
     atuin
     eza
     procs
-    yazi
+    yazi # terminal filemanager
     fzf
     tree
     kitty
-    masterpdfeditor
+    # masterpdfeditor # more updated when I do it myself
     discord
     fastfetch
     stremio
@@ -34,8 +39,29 @@
     bat
     dust
     fd
-
+    btop
+    nodePackages.web-ext
+    kicad
+    localsend
+    fritzing
+    httptoolkit
+    binutils
+    imhex
+    rustdesk
+    radeontop
+    liquidctl
+    amdgpu_top
+    dig
+    tcpdump
+    # carla
+    easyeffects
+    yabridge
+    yabridgectl
+    wineWowPackages.stable
+    qalculate-qt
+    onlyoffice-desktopeditors
   ];
+
 
   programs.git = {
     enable = true;
@@ -54,6 +80,7 @@
     };
     interactiveShellInit = ''
       atuin init fish | source
+      fastfetch
     '';
   };
 
@@ -64,8 +91,15 @@
 
   programs.atuin.enable = true;
 
+  services.easyeffects.enable = true;
   services.flameshot = {
     enable = true;
+    settings = {
+      General = {
+        showHelp = false;
+        startupLaunch = true;
+      };
+    };
   };
 
 }

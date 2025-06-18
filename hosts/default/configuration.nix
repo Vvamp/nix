@@ -72,6 +72,10 @@
     libgcc
     file
     unp
+    fuse
+    qt5.qtbase
+    qt5.qtwayland # if needed
+    qt5.wrapQtAppsHook
     gnumake
     pandoc
     screen
@@ -80,7 +84,36 @@
     unrar
     ripgrep
     nixfmt-rfc-style # Nix format
+    ethtool
+    nettools
+    texlive.combined.scheme-full
+    mitmproxy
+    kdePackages.qtstyleplugin-kvantum
+    kdePackages.breeze-icons
+    hicolor-icon-theme
+    adwaita-icon-theme
+    libsForQt5.qtstyleplugin-kvantum
+    catppuccin-kvantum
+    openssl
+    libsForQt5.qt5ct
+    usbutils
+
+    catppuccin-gtk # the GTK theme
+    (pkgs.catppuccin-gtk.override {
+      variant = "macchiato";
+      accents = [ "red" ];
+      size = "compact";
+      tweaks = [ "rimless" ];
+    })
+
+    # Logitech Mouse
+    piper
+    solaar
+    libratbag
   ];
+
+  virtualisation.docker.enable = true;
+  programs.coolercontrol.enable = true;
 
   # User setup
   users.users.vvamp = {
@@ -91,6 +124,8 @@
       "networkmanager"
       "wheel"
       "dialout"
+      "docker"
+      "audio"
     ];
   };
   programs.fish.enable = true;
@@ -98,6 +133,9 @@
   # Hostname, Networking & Locale
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+  networking.interfaces.eno1.wakeOnLan = {
+    enable = true;
+  };
   time.timeZone = "Europe/Amsterdam";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -139,6 +177,17 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    jack.enable = true;
+
+    extraConfig.pipewire."10-audio".context.properties = {
+      "default.clock.rate" = 48000;
+      "default.clock.quantum" = 256;
+      "default.clock.min-quantum" = 64;
+      "default.clock.max-quantum" = 1024;
+      "default.clock.force-quantum" = 256;
+      "default.clock.force-rate" = 48000;
+      "default.clock.priority" = 95;
+    };
   };
   security.rtkit.enable = true;
 
@@ -153,6 +202,15 @@
 
   # Flatpak
   services.flatpak.enable = true;
+
+  # Ratbag
+  services.ratbagd.enable = true;
+  # OpenRGB
+  services.hardware.openrgb = {
+    enable = true;
+    package = pkgs.openrgb-with-all-plugins;
+
+  };
 
   # Steam & Gamescope
   programs.steam = {
@@ -174,6 +232,7 @@
           stdenv.cc.cc.lib
           libkrb5
           keyutils
+
         ];
     };
   };
@@ -195,6 +254,7 @@
   environment.sessionVariables = {
     GDK_BACKEND = "wayland,x11";
     QT_QPA_PLATFORM = "wayland;xcb";
+    QT_STYLE_OVERRIDE = "kvantum";
     CLUTTER_BACKEND = "wayland";
     XDG_SESSION_TYPE = "wayland";
     WLR_NO_HARDWARE_CURSORS = "1";
@@ -206,6 +266,12 @@
     XDG_DATA_DIRS = lib.mkBefore [
       "/var/lib/flatpak/exports/share"
       "/home/vvamp/.local/share/flatpak/exports/share"
+      "/home/vvamp/.local/share"
+      "/usr/local/share"
+      "/usr/share"
+      "${pkgs.hicolor-icon-theme}/share"
+      "${pkgs.adwaita-icon-theme}/share"
+      "${pkgs.kdePackages.breeze-icons}/share"
     ];
   };
 
@@ -232,6 +298,7 @@
     xorg.libX11
     libxkbcommon
     qt5.qtbase.dev
+
   ];
 
   # GPU
@@ -242,4 +309,98 @@
 
   # System state version
   system.stateVersion = "25.05";
+
+  systemd.services.hoveryProxy = {
+    description = "Hoverify CONNECT proxy";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "/run/current-system/sw/bin/node /home/vvamp/Documents/Coding/Linux/HoverifyCrack2/proxy.js";
+      Restart = "on-failure";
+      User = "root"; # or "vvamp" if you want your own user
+      WorkingDirectory = "/home/vvamp/Documents/Coding/Linux/HoverifyCrack2";
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+  };
+
+  security.pam.loginLimits = [
+    {
+      domain = "@audio";
+      type = "hard";
+      item = "memlock";
+      value = "unlimited";
+    }
+    {
+      domain = "@audio";
+      type = "soft";
+      item = "memlock";
+      value = "unlimited";
+    }
+    {
+      domain = "@audio";
+      type = "hard";
+      item = "rtprio";
+      value = "95";
+    }
+    {
+      domain = "@audio";
+      type = "soft";
+      item = "rtprio";
+      value = "95";
+    }
+  ];
+
+  # Local nginx proxy
+  # services.nginx = {
+  #   enable = true;
+  #   virtualHosts."reg.code-industry.net" = {
+  #     listen = [
+  #       {
+  #         addr = "127.0.0.1";
+  #         port = 80;
+  #       }
+  #     ];
+  #     locations."/" = {
+  #       return = "301 http://crack.vvamp.dev/mpe-5/$request_uri";
+  #     };
+  #   };
+  # };
+  services.nginx = {
+    enable = true;
+    virtualHosts."reg.code-industry.net" = {
+      listen = [
+        {
+          addr = "127.0.0.1";
+          port = 80;
+        }
+      ];
+
+      locations."/" = {
+        proxyPass = "http://crack.vvamp.dev/mpe-5/";
+        proxyWebsockets = true; # Optional, but good if the target uses WS
+      };
+    };
+  };
+  networking.extraHosts = ''
+    127.0.0.1 reg.code-industry.net
+  '';
+
+  # Firewall
+  networking.firewall.enable = true;
+  networking.firewall.allowedUDPPorts = [
+    7777 # ASA
+    7778 # ASE (ARk survival evolved)
+    5000
+  ];
+
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+    1616 # SSH
+    27020 # ASA
+    27015 # ASE
+    5000
+    53317 # LocalSend
+  ];
 }
